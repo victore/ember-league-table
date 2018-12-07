@@ -20,5 +20,12 @@ export default DS.Model.extend({
     return this.homeGoals < this.awayGoals;
   }),
 
+  winningTeam: computed('isHomeWin', 'isAwayWin', 'homeTeam', 'awayTeam', function() {
+    if (this.isHomeWin) {
+      return this.homeTeam;
+    } else if (this.isAwayWin) {
+      return this.awayTeam;
+    }
+  }),
 
 });

@@ -1,5 +1,6 @@
 import DS from 'ember-data';
 import { union, filterBy, sum, mapBy } from '@ember/object/computed';
+import { computed } from '@ember/object';
 
 export default DS.Model.extend({
   name: DS.attr('string'),
@@ -17,4 +18,33 @@ export default DS.Model.extend({
   gamesLost: union('homeGamesLost', 'awayGamesLost'),
 
   gamesDrawn: filterBy('games', 'isDraw'),
+
+  homeGoalsScoredArray: mapBy('homeGames', 'homeGoals'),
+  homeGoalsScored: sum('homeGoalsScoredArray'),
+
+  awayGoalsScoredArray: mapBy('awayGames', 'awayGoals'),
+  awayGoalsScored: sum('awayGoalsScoredArray'),
+
+  goalsScored: computed('homeGoalsScored', 'awayGoalsScored', function() {
+    return this.homeGoalsScored + this.awayGoalsScored;
+  }),
+
+  homeGoalsConcededArray: mapBy('homeGames', 'awayGoals'),
+  homeGoalsConceded: sum('homeGoalsConcededArray'),
+
+  awayGoalsConcededArray: mapBy('awayGames', 'homeGoals'),
+  awayGoalsConceded: sum('awayGoalsConcededArray'),
+
+  goalsConceded: computed('homeGoalsConceded', 'awayGoalsConceded', function() {
+    return this.homeGoalsConceded + this.awayGoalsConceded;
+  }),
+
+  goalDifference: computed('goalsScored', 'goalsConceded', function() {
+    return this.goalsScored - this.goalsConceded;
+  }),
+
+  points: computed('gamesWon.length', 'gamesDrawn.length', function() {
+    return (this.gamesWon.length * 3) + this.gamesDrawn.length;
+  })
+
 });
